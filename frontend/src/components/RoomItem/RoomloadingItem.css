@@ -1,0 +1,78 @@
+.room-loading-item {
+  background-color: rgba(255, 255, 255, 1);
+  padding: 1.2rem;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 1rem;
+  border: 1px rgba(226, 232, 240, 1) solid;
+  min-width: 437px;
+  height: 254px;
+  
+}
+
+.skeleton-line {
+  background-color: rgba(237, 237, 237, 1);
+  border-radius: 0.2rem;
+  width: 100%;
+}
+
+
+.skeleton-top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.skeleton-title {
+  height: 2rem;
+  width: 30%; 
+}
+.skeleton-subtitle {
+  height: 1.2rem;
+  width: 15%; 
+}
+
+
+.skeleton-middle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.skeleton-circle {
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%; 
+  background-color: rgba(237, 237, 237, 1);
+  flex-shrink: 0;
+}
+.skeleton-text-line {
+  height: 1.2rem;
+  width: 60%;
+}
+
+.skeleton-availability {
+  height: 2.5rem;
+}
+
+
+.skeleton-actions {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  margin-top: auto;
+}
+
+.skeleton-btn-details,
+.skeleton-btn-book {
+  flex: 1; 
+  height: 2.5rem;
+  background-color: rgba(237, 237, 237, 1);
+  border-radius: 0.5rem;
+}
+

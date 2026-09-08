@@ -1,0 +1,71 @@
+
+.office-selector{
+    padding-inline: 2.5rem;
+    height: 5.9rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.office-selector::after{
+    position: absolute;
+    content: '';
+    bottom:0;
+    left:0;
+    width: 100%;
+    height: 1px;
+    background-color: rgba(148, 163, 184, 1);
+}
+
+.office-info{
+    display: flex;
+    flex-direction: column;
+    gap:0.5rem;
+}
+
+.selector-trigger{
+    display: flex;
+    gap:0.5rem;
+    align-items: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    position: relative;
+}
+
+.circle-divider{
+    background-color:rgba(71, 85, 105, 1);
+    width: 4px;
+    height: 4px;
+    border-radius:50% ;
+}
+
+.office-meta{
+    color:rgba(71, 85, 105, 1);
+    font-size: 0.9rem;
+    display: flex;
+    gap:0.9rem;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.offices-dropdown {
+  position: absolute;
+  top:50%;
+  left: auto;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+  overflow: hidden;
+}
+
+.offices-dropdown ul{
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem;
+}
+
+.offices-dropdown li{
+    margin-top: 2px;
+    cursor: pointer;
+}

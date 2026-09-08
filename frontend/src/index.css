@@ -1,0 +1,30 @@
+a{
+  text-decoration: none;
+  color:black;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+body {
+  box-sizing: border-box;
+  padding: 40px;
+  font-family: 'Manrope', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+
+#root {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+
+
+ 
