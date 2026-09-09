@@ -8,69 +8,113 @@ import RoomItem from "../components/RoomItem/RoomItem";
 import FiletrBar from "../components/FilterBar"
 import './Rooms.css'
 function Rooms(){
-    const [rooms, setRooms] = useState([]);
-    const [selectedOffice, setSelectedOffice] = useState(null);
-    const [offices, setOffices] = useState([]);
-    const [loading, setIsLoading] = useState(false);
-
+    const [rooms, setRooms] = useState([]); // переговорки конкретного офиса
+    const [selectedOffice, setSelectedOffice] = useState(null); // выбранный офис
+    const [offices, setOffices] = useState([]); // все офисы 
+    const [loading, setIsLoading] = useState(false); // состояние загрузки переговорок
+    const [error, setError] = useState(false); // состояние для ошибки загрузки
+    
     const serverUrl = import.meta.env.VITE_API_URL;
 
 
-    // загрузка офисов
-    useEffect(() =>{
-        const loadOffices = async() => {
-
+    
+    useEffect(() => {
+        const loadOffices = async () => {
             try {
-                const res = await fetch(`${serverUrl}/api/vi/offices`);
+                const res = await fetch(`${serverUrl}/api/v1/offices`);
 
-                if(!res.ok){
-                    throw new Error(`ошибка обращения к url офисов ${res.status}`);
+                if (!res.ok) {
+                    throw new Error(`Ошибка обращения к url офисов ${res.status}`);
                 }
 
                 const data = await res.json();
                 setOffices(data.items);
-
-                if (data.items.length > 0){
-                    setSelectedOffice(data.items[0]);
-                }
+                
             } catch (error) {
-                console.log('произошла ошибка загрузки офисов: ', error);
+                console.log('Произошла ошибка загрузки офисов: ', error);
             }
         }
-
         loadOffices();
-    }, []);
+    }, [serverUrl]);
 
-    // загрузка комнат
+
+    // загрузка переговорок выбранного офиса
     useEffect(() =>{
+        if (!selectedOffice) return; 
+
         const loadRooms = async() => {
+            setIsLoading(true);
+            setError(false);
+
             try {
-                const res = await fetch(`${serverUrl}/api/vi/`)
-            } catch (error) {
+                const res = await fetch(`${serverUrl}/api/v1/rooms?officeId=${selectedOffice.id}`)
+
+                if(!res.ok){
+                    throw new Error(`ошибка обращения к url: ${res.status}` );
+                    
+                }
                 
+                const data = await res.json();
+                setRooms(data.items);
+            
+
+            } catch (error) {
+                console.log('ошибка: ', error.status);
+                setError(true);
+            }finally{
+                setIsLoading(false);
             }
         }
 
         loadRooms();
-    }, []);
+    }, [selectedOffice, serverUrl]);
 
 
     return (
-        <>
-            <OfficeSelector/>
-            <FiletrBar/>
-            <div className="rooms-page-wrapper">
+        <div className="rooms-page-wrapper">
+           <OfficeSelector
+            selectedOffice={selectedOffice}
+            onOfficeChange={setSelectedOffice}
+            offices={offices}
+           />
+           <FiletrBar
+            selectedOffice={selectedOffice}
+           />
+           <div className="rooms_main-content">
+            {!selectedOffice && <RoomsNoOffices/>}
+            {selectedOffice && (
+                loading  ?  (
+                <>
+                    <h2 className="selectedOffice__header">Загрузка переговорных...</h2>
+                    <div className="rooms_main-content__items">
+                        {[1,2,3,4].map((item) => (
+                            <RoomLoadingItem key={item}/>
+                        ))}
+                    </div>
+                </>
+            ): error ? (
+                <RoomsError/>
+            ) : rooms.length > 0 ? (<>
+                    <h2 className="selectedOffice__header">Доступные переговорные в этом офисе</h2>
+                    <div className="rooms_main-content__items">
+                            {rooms.map((room) => (
+                                <RoomItem
+                                    key={room.id}
+                                    name={room.name}
+                                    floor={room.floor}
+                                    capacity={room.capacity}
+                                    availability={room.available}
+                                />
+                        ))}
+                    </div>
+            </>) : (
+                <RoomsEmpty/>
+            )
+            )}
             
-            <div className="rooms_main-content__items">
-                <RoomItem/>
-                <RoomItem/>
-                <RoomItem/>
-                <RoomItem/>
-            </div>
             
-
+           </div>
         </div>
-        </>
         
     )
     

@@ -2,41 +2,8 @@ import { useState, useEffect } from "react"
 import "./OfficeSelector.css"
 import Arrow from "../assets/arrowDown.svg"
 
-function OfficeSelector(){
-    const [selectedOffice, setselectedOffice] = useState(null);
-    const [offices, setOffices] = useState([]);
-    const [isOpen, setIsOpen] = useState(false);
-    const [currentTime, setCurrentTime] = useState("");
-
-  
-    const apiUrl = import.meta.env.VITE_API_URL;
-
-    useEffect(()=> {
-        const loadOffices = async() => {
-            try{
-                
-                const res = await fetch(`${apiUrl}/api/v1/offices`);
-                
-                if (!res.ok){
-                    throw new Error ('Ошибка HTTP: ' + res.status);
-                }
-
-                const data = await res.json();
-                setOffices(data.items);
-                console.log('data from server: ', data);
-
-                if(data.items.length > 0){
-                    setselectedOffice(data.items[0])
-                }
-            }
-            catch (error){
-                console.log('произошла ошибка: ', error);
-            }
-
-        }
-        loadOffices();
-
-    },[]);
+function OfficeSelector({selectedOffice, onOfficeChange, offices}){
+    const [isOpen, setIsOpen] = useState(false); // состояние для списка офисов
     
     function handleOfficeClick(){
         setIsOpen(!isOpen);
@@ -44,7 +11,7 @@ function OfficeSelector(){
 
     function handleSelectedOffice(e, office){
         e.stopPropagation();
-        setselectedOffice(office);
+        onOfficeChange(office);
         setIsOpen(false);
     }
 
@@ -90,8 +57,8 @@ function OfficeSelector(){
         <>
             <div className="office-selector">
                 <div className="office-info">
-                    <div className="selector-trigger">
-                        <span> {selectedOffice?.name}</span>
+                    <div className="selector-trigger" onClick={handleOfficeClick}>
+                        <span> {selectedOffice ? selectedOffice.name : "Выберите офис"}</span>
                         <span
                             onClick={handleOfficeClick}
                             style={{cursor:'pointer'}}
@@ -101,9 +68,9 @@ function OfficeSelector(){
                     </div>
 
                     <div className="office-meta">
-                        <span className="office-street">{selectedOffice?.address}</span>
+                        <span className="office-street">{selectedOffice ? selectedOffice.address : "Адрес не выбран"}</span>
                         <span className="circle-divider"></span>
-                        <span className="current-time">Местное время: {formatTime(selectedOffice?.timezone)}</span>
+                        <span className="current-time">Местное время: {selectedOffice ? formatTime(selectedOffice?.timezone) : "--"}</span>
                     </div>
 
                     {isOpen && (

@@ -1,14 +1,14 @@
 import './RoomItem.css'
 
-function RoomItem(props){
+function RoomItem({name, floor, capacity, availability}){
     return(
         <div className='room-card'>
             <div className="card-header">
-                <h2 className='room-name'>{props.name}</h2>
-                <p className='room-floor'>{props.floor} этаж</p>
+                <h2 className='room-name'>{name}</h2>
+                <p className='room-floor'>{floor} этаж</p>
             </div>
             <div className="room-stats">
-                <p className='room-capacity'>Вместимость до: {props.capacity} человек</p>
+                <p className='room-capacity'>Вместимость до: {capacity} человек</p>
                 <p className='room-time'>Занята до </p>
             </div>
             <div className="availability-bar">
