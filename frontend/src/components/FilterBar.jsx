@@ -20,30 +20,25 @@ function formatMinutes(totalMinutes) {
     return `${hours} ч ${minutes} мин`;
 }
 
-function FilterBar({selectedOffice}) {
-    const [startDate, setStartDate] = useState(null);
-    const [timeValue, setTimeValue] = useState("");
+function FilterBar({selectedOffice, filters, setFilters}) {
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + 30); 
 
-    const [durationOpen, setDurationOpen] = useState(false);
-    const [selectedDuration, setSelectedDuration] = useState("Выберите");
-   
+    const [durationOpen, setDurationOpen] = useState(false);   
     const [capacityOpen, setCapacityOpen] = useState(false);
-    const [selectedCapacity, setSelectedCapacity] = useState("Не указано");
     
    
     const capacities = ["1 чел.", "2 чел.", "4 чел.", "6 чел.", "8 чел.", "10 чел.", "12 чел."];
 
     const getDynamicDurations = () => {
-        if (!timeValue || timeValue.length < 5) {
+        if (!filters.time || filters.time.length < 5) {
             const defaultList = [];
             for (let mins = 15; mins <= 180; mins += 15) {
                 defaultList.push({ label: formatMinutes(mins), mins: mins });
             }
             return defaultList;
         }
-        const [hours, minutes] = timeValue.split(':').map(Number);
+        const [hours, minutes] = filters.time.split(':').map(Number);
         const currentMins = hours * 60 + minutes;
         const closingMins = 20 * 60;
         const maxAvailableMins = closingMins - currentMins;
@@ -61,12 +56,12 @@ function FilterBar({selectedOffice}) {
         let input = e.target.value.replace(/\D/g, "");
         if (input.length > 4) { input = input.substring(0, 4); }
         if (input.length > 2) { input = input.substring(0, 2) + ":" + input.substring(2); }
-        setTimeValue(input);
+        setFilters(prev => ({...prev, time:input}))
     }
 
     const handleTimeBlur = () => {
-        if (!timeValue) return;
-        let [hours, minutes] = timeValue.split(':').map(Number);
+        if (!filters.time) return;
+        let [hours, minutes] = filters.time.split(':').map(Number);
         
         if (!isNaN(minutes)) {
             minutes = Math.round(minutes / 15) * 15;
@@ -80,18 +75,20 @@ function FilterBar({selectedOffice}) {
         const validMinutes = minutes < 10 ? `0${minutes}` : minutes;
         const formattedTime = `${validHours}:${validMinutes}`;
         
-        setTimeValue(formattedTime);
 
         const currentMins = hours * 60 + minutes;
         const minsLeft = (20 * 60) - currentMins;
-        const freshOptions = [];
-        for (let mins = 15; mins <= minsLeft; mins += 15) {
-            freshOptions.push({ label: formatMinutes(mins), mins: mins });
+        let updatedDuration = filters.duration;
+        if (filters.duration && filters.duration > minsLeft) {
+            updatedDuration = minsLeft > 0 ? minsLeft : null;
         }
-        const isStillValid = freshOptions.some(item => item.label === selectedDuration);
-        if (!isStillValid && freshOptions.length > 0) {
-            setSelectedDuration(freshOptions[freshOptions.length - 1].label);
-        }
+
+        
+        setFilters(prev => ({
+            ...prev,
+            time:formattedTime,
+            duration: updatedDuration
+        }))
     }
 
     return (
@@ -103,8 +100,8 @@ function FilterBar({selectedOffice}) {
                 <div className="datepicker-wrapper">
                     <DatePicker
                         id="calendar"
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
+                        selected={filters.date}
+                        onChange={(date) => setFilters(prev => ({ ...prev, date }))}
                         dateFormat="d MMMM, eeeeee" 
                         locale="ru"
                         minDate={new Date()}
@@ -127,7 +124,7 @@ function FilterBar({selectedOffice}) {
                         name="time" 
                         onChange={handleTimeChange}
                         placeholder="--:--"
-                        value={timeValue}
+                        value={filters.time}
                         onBlur={handleTimeBlur}
                         className="time-input"
                         disabled={!selectedOffice}
@@ -145,7 +142,7 @@ function FilterBar({selectedOffice}) {
                         setCapacityOpen(false); 
                     }}
                 >
-                    <span>{selectedDuration}</span>
+                    <span>{filters.duration ? formatMinutes(filters.duration) : "Выберите"}</span>
                     <div className="select-arrow"></div>
                 </div>
 
@@ -154,9 +151,9 @@ function FilterBar({selectedOffice}) {
                         {availableDurations.map((item) => (
                             <div
                                 key={item.label}
-                                className={`dropdown-item ${selectedDuration === item.label ? "selected" : ""}`}
+                                className={`dropdown-item ${filters.duration === item.mins ? "selected" : ""}`}
                                 onClick={() => {
-                                    setSelectedDuration(item.label);
+                                    setFilters(prev => ({ ...prev, duration: item.mins })); 
                                     setDurationOpen(false);
                                 }}
                             >
@@ -177,24 +174,27 @@ function FilterBar({selectedOffice}) {
                         setDurationOpen(false); 
                     }}
                 >
-                    <span>{selectedCapacity}</span>
+                    <span>{filters.capacity ? `${filters.capacity} чел.` : "Не указано"}</span>
                     <div className="select-arrow"></div>
                 </div>
 
                 {capacityOpen && (
                     <div className="select-dropdown">
-                        {capacities.map((item) => (
-                            <div
-                                key={item}
-                                className={`dropdown-item ${selectedCapacity === item ? "selected" : ""}`}
-                                onClick={() => {
-                                    setSelectedCapacity(item);
-                                    setCapacityOpen(false);
-                                }}
-                            >
-                                {item}
-                            </div>
-                        ))}
+                        {capacities.map((item) => {
+                            const numericCapacity = parseInt(item); 
+                            return (
+                                <div
+                                    key={item}
+                                    className={`dropdown-item ${filters.capacity === numericCapacity ? "selected" : ""}`}
+                                    onClick={() => {
+                                        setFilters(prev => ({ ...prev, capacity: numericCapacity }));
+                                        setCapacityOpen(false);
+                                    }}
+                                >
+                                    {item}
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>

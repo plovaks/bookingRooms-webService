@@ -16,8 +16,26 @@ function Rooms(){
     
     const serverUrl = import.meta.env.VITE_API_URL;
 
+    const [filters, setFilters] = useState({
+        date:null,
+        time:"",
+        duration:null,
+        capacity:null
+    })
 
+    const isEventOverlappingUserTime = (eventStartsAt, eventEndsAt) => {
     
+    if (!filters.date || !filters.time || filters.time.length !== 5 || !filters.duration) return false;
+
+    const userStart = new Date(filters.date);
+    const [hours, minutes] = filters.time.split(':').map(Number);
+    userStart.setHours(hours, minutes, 0, 0);
+    const userStartIso = userStart.toISOString();
+    const userEndIso = new Date(userStart.getTime() + filters.duration * 60000).toISOString();
+
+    return (userStartIso < eventEndsAt && userEndIso > eventStartsAt);
+};
+
     useEffect(() => {
         const loadOffices = async () => {
             try {
@@ -47,7 +65,26 @@ function Rooms(){
             setError(false);
 
             try {
-                const res = await fetch(`${serverUrl}/api/v1/rooms?officeId=${selectedOffice.id}`)
+                let url = `${serverUrl}/api/v1/rooms?officeId=${selectedOffice.id}`;
+
+                if(filters.capacity){
+                    url+=`&minCapacity=${filters.capacity}`;
+                }
+
+                if (filters.date && filters.time && filters.duration){
+                    const fromDate = new Date(filters.date);
+                    const [hours, minutes] = filters.time.split(':').map(Number);
+
+                    fromDate.setHours(hours, minutes, 0, 0);
+
+                    const toDate = new Date(fromDate.getTime() + filters.duration * 60000);
+                    const fromIso = encodeURIComponent(fromDate.toISOString());
+                    const toIso = encodeURIComponent(toDate.toISOString());
+
+                    url+=`&from=${fromIso}&to=${toIso}`
+                }
+
+                const res = await fetch(url);
 
                 if(!res.ok){
                     throw new Error(`ошибка обращения к url: ${res.status}` );
@@ -67,7 +104,50 @@ function Rooms(){
         }
 
         loadRooms();
-    }, [selectedOffice, serverUrl]);
+    }, [selectedOffice, filters.capacity, filters.date, filters.duration, filters.time, serverUrl]);
+
+        useEffect(() => {
+        if (!selectedOffice) return;
+
+        const ws = new WebSocket(`${serverUrl.replace('http', 'ws')}/api/v1/ws`);
+
+        ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+
+            if (message.type === 'room.availability_changed' && message.data) {
+                const { roomId, officeId, startsAt, endsAt, available } = message.data;
+
+                if (officeId != selectedOffice.id) return;
+
+                const isOverlap = isEventOverlappingUserTime(startsAt, endsAt);
+
+                if (isOverlap) {
+                    setRooms(prevRooms => prevRooms.map(room => {
+                        if (roomId != room.id) return room; 
+
+                        const endDate = new Date(endsAt);
+                        const formattedTime = `${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}`;
+
+                        return {
+                            ...room,
+                            available: available, 
+                            busyUntil: !available ? formattedTime : null 
+                        };
+                    }));
+                }
+            }
+
+            if (message.type === 'data.reset') {
+                setSelectedOffice(null);
+                setRooms([]);
+            }
+        };
+
+        return () => {
+            ws.close();
+        };
+        
+    }, [selectedOffice, filters.date, filters.time, filters.duration, serverUrl]);
 
 
     return (
@@ -79,6 +159,8 @@ function Rooms(){
            />
            <FiletrBar
             selectedOffice={selectedOffice}
+            filters={filters}
+            setFilters={setFilters}
            />
            <div className="rooms_main-content">
             {!selectedOffice && <RoomsNoOffices/>}
@@ -100,10 +182,12 @@ function Rooms(){
                             {rooms.map((room) => (
                                 <RoomItem
                                     key={room.id}
+                                    id={room.id}
                                     name={room.name}
                                     floor={room.floor}
                                     capacity={room.capacity}
                                     availability={room.available}
+                                    busyUntil={room.busyUntil}
                                 />
                         ))}
                     </div>

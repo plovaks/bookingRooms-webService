@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router'
 import './App.css'
 import Booking from './pages/Booking'
-import RoomId from './pages/RoomId'
+import RoomId from './pages/RoomId/RoomId'
 import NotFound from './pages/NotFound'
 import Rooms from './pages/Rooms'
 import Navbar from './components/Navbar'
