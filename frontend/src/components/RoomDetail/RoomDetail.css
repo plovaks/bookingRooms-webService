@@ -1,0 +1,184 @@
+.room-detail-header{
+    padding-top: 1.5rem;
+    padding-bottom: 0.75rem;
+    background-color: rgb(248, 250, 252);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap:0.5rem;
+    color: rgba(71, 85, 105, 1);
+    
+}
+
+.room-detail-header span:last-of-type{
+    color: rgba(15, 23, 42, 1);
+    font-weight: 600;
+}
+
+
+
+.detail-columns{
+    display: flex;
+    gap:2rem;
+    align-items: flex-start;
+}
+
+.left-info-column{
+    padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 1);
+    border:1px rgba(226, 232, 240, 1) solid;
+    border-radius: 1rem;
+    width: 26rem;
+}
+
+.room-info-office{
+    color:rgba(71, 85, 105, 1);
+    display: flex;
+    align-items: center;
+    gap:5px;
+}
+
+.info-office-circle{
+    background-color:rgba(71, 85, 105, 1);
+    border-radius: 50%;
+    width: 4px;
+    height: 4px;
+    margin-inline: 3px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+ul{
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+li{
+    display: flex;
+    align-items: center;
+    gap:0.8rem;
+}
+
+.room-info-capacity::before{
+    content: url("../../assets/capacityGreen.svg");
+    width: 1rem;
+    height: 1rem;
+}
+
+.room-info-feature.feature-display::before {
+    content: url('../../assets/tvGreen.svg'); 
+    width: 1rem;
+    height: 1rem;
+}
+
+.room-info-feature.feature-whiteboard::before {
+    content: url('../../assets/editGreen.svg'); 
+    width: 1rem;
+    height: 1rem;
+}
+
+.room-info-feature.feature-video::before {
+    content: url('../../assets/videoGreen.svg'); 
+    width: 1rem;
+    height: 1rem;
+}
+
+/* правая колонка */
+
+.right-schedule-column{
+    width: 100%;
+    background-color: rgba(255, 255, 255, 1);
+    border: 1px rgba(226, 232, 240, 1) solid;
+    border-radius: 1rem;
+    padding: 2rem;
+}
+
+.schedule__header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.schedule-date{
+    color: rgba(71, 85, 105, 1);
+}
+
+.schedule__header--date{
+    display: flex;
+    flex-direction: column;
+    gap:4px;
+}
+
+.schedule-action{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-choseDate{
+    display: flex;
+    align-items: center;
+    gap:0.5rem;
+    background-color: transparent;
+    border: none;
+    border-radius: 0.5rem;
+    border:1px rgba(226, 232, 240, 1) solid;
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+}
+
+.btn-book{
+    padding: 0.7rem 1.5rem;
+   
+}
+
+/* сетка часов  */
+
+.timeline-grid{
+    margin-block: 1.5rem;
+    color:rgba(71, 85, 105, 1);
+}
+
+.timeline-hour-row{
+    height: 3rem;
+}
+
+.timeline-hour-line{
+    flex-grow: 1;
+    height: 1px;
+    background-color: rgba(226, 232, 240, 1);
+    margin-left: 4rem;
+    margin-top: 30px;
+}
+
+/* состояние ошибки */
+
+.errorBlock{
+    background-color: rgba(255, 255, 255, 1);
+    border: 1px rgba(226, 232, 240, 1) solid;
+    border-radius: 1rem;
+    width: 100%;
+    padding-block: 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.errorBlock .text-group{
+    margin-block: 1.5rem;
+}
+
+.errorBlock .text-group p{
+    color:rgba(71, 85, 105, 1);
+    font-weight: 400;
+    font-size: 1rem;
+    max-width: 26rem;
+    line-height: 150%;
+}
+
+.errorBlock .button-green{
+    padding: 0.75rem 1.5rem;
+}
+

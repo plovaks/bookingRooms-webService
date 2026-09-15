@@ -46,6 +46,7 @@ body {
   border:none;
   font-family: 'Manrope', sans-serif;
   border-radius: 0.5rem;
+  cursor: pointer;
 }
 
 
