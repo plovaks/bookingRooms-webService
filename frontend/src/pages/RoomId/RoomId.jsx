@@ -19,6 +19,8 @@ function RoomId(){
     const [bookings, setBookings] = useState([]);
     // стейт для модального окна бронирования
     const [isModalOpen, setIsModalOpen] = useState(false);
+    // состояние для инф. об успешном бронировании комнаты
+    const [successBookingData, setSuccessBookingData] = useState(null);
 
     // получение информации о комнате
     useEffect(() => {
@@ -50,13 +52,27 @@ function RoomId(){
     
     }, [paramId, serverurl]);
 
+    function handleBookRoom(){
+        setIsModalOpen(true);
+    }
+
     return(
         <div className='room'>
             <RoomDetail 
                 roomDetails={roomDetails}
                 loading={loading}
                 shceduleError={shceduleError}
+                onClick={handleBookRoom}
             />
+
+
+            {isModalOpen && (
+                <BookingModal
+                    roomId={roomDetails}
+                    onClose={() => setIsModalOpen(false)}
+                />
+            )}
+
         </div>
     )
 }

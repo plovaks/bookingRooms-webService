@@ -5,7 +5,7 @@ import calendarIcon from "../../assets/calendarIcon.svg"
 import arrowRight from "../../assets/arrowRight.svg"
 import errorImg from '../../assets/roomsErrorAlert.svg'
 
-function RoomDetail({roomDetails, loading, shceduleError}){
+function RoomDetail({roomDetails, loading, shceduleError, onClick}){
     // дата для расписания
     const today = new Date();
     
@@ -144,6 +144,7 @@ function RoomDetail({roomDetails, loading, shceduleError}){
                         <div className="schedule-action">
                             <button
                                 className={`button-green btn-book`}
+                                onClick={onClick}
                             >
                                 Забронировать переговорную
                             </button>
