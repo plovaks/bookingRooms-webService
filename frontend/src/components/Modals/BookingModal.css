@@ -68,12 +68,48 @@
     flex-direction: column;
     align-items: flex-start;
     gap:6px;
+    width: 100%;
+}
+
+.form-field.has-error input{
+    border-color: rgba(239, 68, 68, 1);
+}
+
+.error-message{
+    color:rgba(239, 68, 68, 1);
+    font-size: 0.75rem;
+    font-weight: 600;
 }
 
 .form-field-time{
     display: flex;
     align-items: center;
     gap:1rem;
+   
+}
+
+.form-field-time > div{
+    flex:1;
+}
+
+.time-input-wrapper{
+    width: 100%;
+    position: relative;
+}
+
+
+.time-input-wrapper::before {
+    content: "";
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    background-image: url('../../assets/timeIcon.svg');
+    background-repeat: no-repeat;
+    background-size: contain;
+    z-index: 1;
 }
 
 label{
@@ -81,6 +117,7 @@ label{
     font-weight: 700;
     font-size: 0.8rem;
 }
+
 
 input, textarea{
     box-sizing: border-box;
@@ -100,6 +137,33 @@ textarea{
     min-height: 5rem;
     resize: none;
 }
+
+
+.time-input.booking{
+    width: 100% !important;
+}
+
+.select-custom-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.select-dropdown {
+    position: absolute;
+    top: 100%; 
+    width: 100%;
+    left: 0;
+    max-height: 200px; 
+    overflow-y: auto; 
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
+    z-index: 999;
+    margin-top: 4px; 
+    box-sizing: border-box;
+}
+
 
 .summary-banner{
     display: flex;

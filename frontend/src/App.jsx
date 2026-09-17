@@ -5,12 +5,14 @@ import RoomId from './pages/RoomId/RoomId'
 import NotFound from './pages/NotFound'
 import Rooms from './pages/Rooms'
 import Navbar from './components/Navbar'
+import { Toaster } from 'react-hot-toast'
 
 function App() {
   
   return (
     <>
       <Navbar/>
+      <Toaster/>
       <Routes>
         <Route path="/" element={<Rooms/>}/>
         <Route path="/rooms/:id" element={<RoomId/>}/>
