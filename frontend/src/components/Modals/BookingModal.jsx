@@ -1,62 +1,49 @@
 import { useState } from 'react';
-import './BookingModal.css'
-import infoIcon from "../../assets/info.svg"
-import errorImg from "../../assets/roomsErrorAlert.svg"
+import './BookingModal.css';
+import infoIcon from "../../assets/info.svg";
+import errorImg from "../../assets/roomsErrorAlert.svg";
 import DatePicker from 'react-datepicker';
-import {toast} from "react-hot-toast"
+import { toast } from "react-hot-toast";
 import { registerLocale } from "react-datepicker";
 import { ru } from 'date-fns/locale/ru';
-import 'react-datepicker/dist/react-datepicker.css'; 
+import SuccessBooking from '../SuccessBooling/SuccessBooking';
+import 'react-datepicker/dist/react-datepicker.css';
 registerLocale('ru', ru);
- 
 
-function BookingModal({roomId, onClose}){
-
+function BookingModal({ roomId, onClose, onSuccess }) {
     const serverUrl = import.meta.env.VITE_API_URL;
 
     const [startDate, setStartDate] = useState(new Date());
     const maxBookingDate = new Date();
     maxBookingDate.setDate(maxBookingDate.getDate() + 30);
 
-    // стейт для баннера брони
     const [isBookingInfo, setIsBookingInfo] = useState(true);
-    // стейт для состояния модалки
     const [status, setStatus] = useState('form');
-    // состояние для ввода темы 
     const [theme, setTheme] = useState('');
     const [themeError, setThemeError] = useState(false);
-    // состояние для времени 
-    const [time, setTime] =useState('');
-    // стейт для длительности
-    const [duration, setDuration] = useState(null); 
+    const [time, setTime] = useState('');
+    const [duration, setDuration] = useState(null);
     const [durationOpen, setDurationOpen] = useState(false);
-    // состояние для комментария
     const [comment, setComment] = useState('');
-    // стейт для тоста об успешной брони
-    const [bookingInfo, setBookingInfo] = useState('');
-    
 
-    const handleOverlayClick = (e) =>
-    {
-        if (e.target.className === 'modal-overlay'){
+    const handleOverlayClick = (e) => {
+        if (e.target.classList.contains('modal-overlay')) {
             onClose();
         }
-    }
+    };
 
-    // функция для обработки отправки формы
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if(theme.trim() === ''){
+        if (theme.trim() === '') {
             setThemeError(true);
             return;
         }
         setThemeError(false);
 
-
-        if(!time || !duration){
-            alert('Пожалуйста, выберите время и продолжительность встречи')
-            return
+        if (!time || !duration) {
+            alert('Пожалуйста, выберите время и продолжительность встречи');
+            return;
         }
 
         const [hours, minutes] = time.split(':').map(Number);
@@ -68,54 +55,65 @@ function BookingModal({roomId, onClose}){
         endTimeDate.setMinutes(endTimeDate.getMinutes() + duration);
 
         const bookingData = {
-            "roomId": roomId.id,
-            "title": theme,
-            "comment": comment,
-            "startsAt": startDateTime.toISOString(),
-            "endsAt": endTimeDate.toISOString()
-        }
+            roomId: roomId.id,
+            title: theme,
+            comment: comment,
+            startsAt: startDateTime.toISOString(),
+            endsAt: endTimeDate.toISOString(),
+        };
 
         try {
             const res = await fetch(`${serverUrl}/api/v1/bookings`, {
                 method: 'POST',
-                headers:{
-                    'Content-Type': 'application/json'
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(bookingData)
-            })
+                body: JSON.stringify(bookingData),
+            });
 
-            const result = await res.json();
+            if (res.ok) {
+                const bookingInfoText = `Комната ${roomId.name}, ${formatSelectedDate(startDate)}, ${getBannerTimeText().slice(2)} MSK`;
 
-            if (result.ok){
-                setBookingInfo(`${roomId.name}, ${formatSelectedDate(startDate)}`)
-                toast.success();
+                toast.custom(
+                    (t) => <SuccessBooking t={t} bookingInfo={bookingInfoText} />,
+                    {
+                        duration: 5000,
+                        position: 'top-center',
+                    }
+                );
+
+                onSuccess?.();
                 onClose();
-                
-            }else if (result.status === 409){
-                setStatus('already-booked')
-            }else{
-                const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.error?.message || 'Не удалось забронировать');
+                return;
             }
-            
+
+            const data = await res.json().catch(() => ({}));
+
+            if (res.status === 409 && data.error?.code === 'BOOKING_CONFLICT') {
+                setStatus('already-booked');
+                return;
+            }
+
+            throw new Error(data.error?.message || 'Не удалось забронировать');
         } catch (error) {
-            console.log(`Ошибка при отправке формы ${error}`)
+            console.error('Ошибка при отправке формы:', error);
+            toast.error(error.message || 'Не удалось забронировать');
         }
-    }
+    };
 
     const handleTimeChange = (e) => {
-        let input = e.target.value.replace(/\D/g, ""); 
-        
+        let input = e.target.value.replace(/\D/g, "");
+
         if (input.length > 4) { input = input.substring(0, 4); }
-        
-        if (input.length >= 2) { 
-            let hours = parseInt(input.substring(0,2), 10);
-            if (hours > 19) hours = 19; 
+
+        if (input.length >= 2) {
+            let hours = parseInt(input.substring(0, 2), 10);
+            if (hours > 19) hours = 19;
             input = String(hours).padStart(2, '0') + input.substring(2);
         }
 
         if (input.length > 2) {
-            let minutesStr = input.substring(2); 
+            let minutesStr = input.substring(2);
             if (parseInt(minutesStr[0], 10) > 5) {
                 minutesStr = "5" + minutesStr.substring(1);
             }
@@ -126,15 +124,15 @@ function BookingModal({roomId, onClose}){
             }
             input = input.substring(0, 2) + ":" + minutesStr;
         }
-        
+
         setTime(input);
-    }
+    };
 
     const handleTimeBlur = () => {
         if (!time) return;
-        
+
         let [hours, minutes] = time.split(':');
-        
+
         if (hours) {
             let hoursNum = parseInt(hours, 10);
             if (hoursNum > 19) hoursNum = 19;
@@ -145,7 +143,7 @@ function BookingModal({roomId, onClose}){
 
         if (minutes) {
             if (minutes.length === 1) {
-                minutes = minutes + '0'; 
+                minutes = minutes + '0';
             }
             if (parseInt(minutes, 10) > 59) minutes = '59';
         } else {
@@ -155,19 +153,18 @@ function BookingModal({roomId, onClose}){
         setTime(`${hours}:${minutes}`);
     };
 
-    // генерация длительности
     const getAvailableDurations = () => {
         if (!time || time.length < 5) return [];
 
         const [hours, minutes] = time.split(':').map(Number);
         const startTotalMinutes = hours * 60 + minutes;
-        const endDayMinutes = 20 * 60; 
+        const endDayMinutes = 20 * 60;
 
         const maxAvailableMinutes = endDayMinutes - startTotalMinutes;
         if (maxAvailableMinutes <= 0) return [];
 
         const list = [];
-        const limit = Math.min(maxAvailableMinutes, 300); 
+        const limit = Math.min(maxAvailableMinutes, 300);
 
         for (let mins = 15; mins <= limit; mins += 15) {
             const endTotal = startTotalMinutes + mins;
@@ -186,7 +183,7 @@ function BookingModal({roomId, onClose}){
 
             list.push({
                 mins: mins,
-                label: `${durationLabel} (до ${formattedEndTime})`
+                label: `${durationLabel} (до ${formattedEndTime})`,
             });
         }
         return list;
@@ -200,8 +197,8 @@ function BookingModal({roomId, onClose}){
     };
 
     const formatSelectedDate = (date) => {
-      if (!date) return '';
-  
+        if (!date) return '';
+
         const dayNameRaw = new Intl.DateTimeFormat('ru-RU', { weekday: 'long' }).format(date);
         const dayName = dayNameRaw.charAt(0).toUpperCase() + dayNameRaw.slice(1);
         const dateAndMonth = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long' }).format(date);
@@ -211,19 +208,19 @@ function BookingModal({roomId, onClose}){
 
     const getBannerTimeText = () => {
         if (!time || !duration) return '';
-        
+
         const selectedItem = availableDurations.find(item => item.mins === duration);
         if (!selectedItem) return '';
 
         const endTimeMatch = selectedItem.label.match(/до (\d{2}:\d{2})/);
         const endTime = endTimeMatch ? endTimeMatch[1] : '';
-        
+
         const durationText = selectedItem.label.split(' (')[0];
 
         return `, ${time} - ${endTime} (${durationText})`;
     };
 
-    return(
+    return (
         <div className='modal-overlay' onClick={handleOverlayClick}>
             <div className="modal-content">
                 {status === 'form' ? (
@@ -235,15 +232,15 @@ function BookingModal({roomId, onClose}){
                         <div className='form-line'></div>
                         <form className='booking-form' onSubmit={handleSubmit}>
                             <div className={`form-field ${themeError ? "has-error" : ""}`}>
-                                <label htmlFor="textTheme" >Тема встречи*</label>
-                                <input 
-                                    type="text" 
-                                    id='textTheme' 
+                                <label htmlFor="textTheme">Тема встречи*</label>
+                                <input
+                                    type="text"
+                                    id='textTheme'
                                     placeholder='Укажите тему встречи'
                                     value={theme}
                                     onChange={(e) => {
                                         setTheme(e.target.value);
-                                        if(e.target.value.trim()!== '') setThemeError(false);
+                                        if (e.target.value.trim() !== '') setThemeError(false);
                                     }}
                                 />
                                 {themeError && <span className='error-message'>Обязательное поле</span>}
@@ -256,7 +253,7 @@ function BookingModal({roomId, onClose}){
                                             id="calendar"
                                             selected={startDate}
                                             onChange={(date) => setStartDate(date)}
-                                            dateFormat="d MMMM, eeeeee" 
+                                            dateFormat="d MMMM, eeeeee"
                                             locale="ru"
                                             minDate={new Date()}
                                             maxDate={maxBookingDate}
@@ -269,10 +266,10 @@ function BookingModal({roomId, onClose}){
                                 <div className="form-time">
                                     <label htmlFor="time-picker">Время</label>
                                     <div className="time-input-wrapper">
-                                        <input 
-                                            type="text" 
-                                            id="time-picker" 
-                                            name="time" 
+                                        <input
+                                            type="text"
+                                            id="time-picker"
+                                            name="time"
                                             onChange={handleTimeChange}
                                             placeholder="--:--"
                                             value={time}
@@ -285,8 +282,8 @@ function BookingModal({roomId, onClose}){
                             <div className="form-field">
                                 <label>Продолжительность</label>
                                 <div className="select-custom-wrapper">
-                                    <div 
-                                        className={`select-custom ${durationOpen ? "open" : ""} ${!time ? "disabled" : ""}`} 
+                                    <div
+                                        className={`select-custom ${durationOpen ? "open" : ""} ${!time ? "disabled" : ""}`}
                                         onClick={() => time && setDurationOpen(!durationOpen)}
                                     >
                                         <span>{time ? getSelectedDurationLabel() : "Сначала выберите время начала"}</span>
@@ -300,7 +297,7 @@ function BookingModal({roomId, onClose}){
                                                     key={item.mins}
                                                     className={`dropdown-item ${duration === item.mins ? "selected" : ""}`}
                                                     onClick={() => {
-                                                        setDuration(item.mins); 
+                                                        setDuration(item.mins);
                                                         setDurationOpen(false);
                                                     }}
                                                 >
@@ -321,8 +318,6 @@ function BookingModal({roomId, onClose}){
                                     onChange={(e) => setComment(e.target.value)}
                                 >
                                 </textarea>
-                                    
-                                
                             </div>
                             {isBookingInfo && (
                                 <div className="summary-banner">
@@ -330,27 +325,24 @@ function BookingModal({roomId, onClose}){
                                     <p>Бронирование на {formatSelectedDate(startDate)} {getBannerTimeText()}</p>
                                 </div>
                             )}
-                            
+
                             <div className="form-actions">
-                                <button className='btn-cancel-booking' type='button'>Отмена</button>
+                                <button className='btn-cancel-booking' type='button' onClick={onClose}>Отмена</button>
                                 <button className='button-green btn-book-room'>Забронировать</button>
                             </div>
                         </form>
                     </>
-                    
                 ) : (
                     <div className='already-booked-container'>
                         <img src={errorImg} alt="error img" />
                         <h2>Время уже занято</h2>
                         <p>Выбранный интервал был забронирован другим сотрудником. Расписание обновлено.</p>
-                        <button className='button-green btn-choseTime'>Выбрать другое время</button>
+                        <button className='button-green btn-choseTime' type="button" onClick={() => setStatus('form')}>Выбрать другое время</button>
                     </div>
-                )
-            }
-                
+                )}
             </div>
         </div>
-    )
+    );
 }
 
 export default BookingModal;

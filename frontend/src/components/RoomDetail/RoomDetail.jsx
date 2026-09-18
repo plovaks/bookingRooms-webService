@@ -1,21 +1,77 @@
+import { useState, useEffect, useRef } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css'
-import './RoomDetail.css'
-import calendarIcon from "../../assets/calendarIcon.svg"
-import arrowRight from "../../assets/arrowRight.svg"
-import errorImg from '../../assets/roomsErrorAlert.svg'
+import 'react-loading-skeleton/dist/skeleton.css';
+import './RoomDetail.css';
+import calendarIcon from "../../assets/calendarIcon.svg";
+import arrowRight from "../../assets/arrowRight.svg";
+import errorImg from '../../assets/roomsErrorAlert.svg';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { ru } from 'date-fns/locale';
 
-function RoomDetail({roomDetails, loading, shceduleError, onClick}){
-    // дата для расписания
-    const today = new Date();
+function RoomDetail({
+    bookings,
+    roomDetails,
+    currentDate,
+    loading,
+    shceduleError,
+    onClick,
+    currentUserId,
+    onChangeDate,
+}) {
+    const DAY_START_HOUR = 9;
+    const HOUR_HEIGHT = 48;
+
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+    const calendarRef = useRef(null);
+
     
-    const currentDate = today.toLocaleString('ru-RU', {
+    useEffect(() => {
+        if (!isCalendarOpen) return;
+        const handleClickOutside = (e) => {
+            if (calendarRef.current && !calendarRef.current.contains(e.target)) {
+                setIsCalendarOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isCalendarOpen]);
+
+    const minutesFromDayStart = (isoString) => {
+        const d = new Date(isoString);
+        return (d.getHours() - DAY_START_HOUR) * 60 + d.getMinutes();
+    };
+
+    const dateLabel = new Date(currentDate).toLocaleString('ru-RU', {
         weekday: 'long',
         day: 'numeric',
-        month:'long'
-    }).replace(/^./, str => str.toUpperCase());
+        month: 'long',
+    }).replace(/^./, (s) => s.toUpperCase());
 
     const timeSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
+
+    const renderBookings = () => (
+        <div className='timeline-bookings'>
+            {bookings.map((booking) => {
+                const top = (minutesFromDayStart(booking.startsAt) / 60) * HOUR_HEIGHT;
+                const height =
+                    ((new Date(booking.endsAt) - new Date(booking.startsAt)) / 3600000) *
+                    HOUR_HEIGHT;
+                const isMine = booking.userId === currentUserId;
+                const label = isMine && booking.title ? booking.title : 'Занято';
+
+                return (
+                    <div
+                        key={booking.id}
+                        className={`timeline-booking ${isMine ? '' : 'timeline-booking--busy'}`}
+                        style={{ top: `${top}px`, height: `${height}px` }}
+                    >
+                        {label}
+                    </div>
+                );
+            })}
+        </div>
+    );
 
     if (loading) {
         return (
@@ -27,9 +83,8 @@ function RoomDetail({roomDetails, loading, shceduleError, onClick}){
                     <img src={arrowRight} alt="right arrow" />
                     <Skeleton width={120} height={14} />
                 </div>
-                
+
                 <div className="detail-columns">
-                    {/* левая колонка */}
                     <div className="left-info-column">
                         <h2 className="room-info-name" style={{ margin: 0 }}>
                             <Skeleton width={160} height={24} />
@@ -37,7 +92,7 @@ function RoomDetail({roomDetails, loading, shceduleError, onClick}){
                         <p className="room-info-office" style={{ marginTop: '12px', marginBottom: '20px' }}>
                             <Skeleton width={240} height={14} />
                         </p>
-                        <div className="room-info-line" style={{display:'block',backgroundColor: 'rgba(226, 232, 240, 1)', height: '1px' }}></div>
+                        <div className="room-info-line" style={{ display: 'block', backgroundColor: 'rgba(226, 232, 240, 1)', height: '1px' }}></div>
                         <ul className="room-info-features">
                             {[1, 2, 3, 4].map((item) => (
                                 <li key={item} style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
@@ -48,7 +103,6 @@ function RoomDetail({roomDetails, loading, shceduleError, onClick}){
                         </ul>
                     </div>
 
-                    {/* правая колонка */}
                     <div className="right-schedule-column">
                         <div className="schedule__header">
                             <div className="schedule__header--date">
@@ -76,9 +130,9 @@ function RoomDetail({roomDetails, loading, shceduleError, onClick}){
                     </div>
                 </div>
             </div>
-            
-        )
+        );
     }
+
     return (
         <div className="room-detail">
             <div className="room-detail-header">
@@ -99,7 +153,7 @@ function RoomDetail({roomDetails, loading, shceduleError, onClick}){
                     <ul className="room-info-features">
                         <li className="room-info-capacity">Вместимость: до {roomDetails.capacity} человек</li>
                         {roomDetails.features?.map(feature => (
-                            <li 
+                            <li
                                 key={feature.code}
                                 className={`room-info-feature feature-${feature.code}`}
                             >
@@ -108,54 +162,77 @@ function RoomDetail({roomDetails, loading, shceduleError, onClick}){
                         ))}
                     </ul>
                 </div>
-                {shceduleError ? 
-                     (
+                {shceduleError ?
+                    (
                         <div className='errorBlock'>
                             <img src={errorImg} alt="room error alert" />
-                                <div className="text-group">
-                                    <h2>Не удалось загрузить данные</h2>
-                                    <p>Произошла ошибка при загрузке расписания переговорной</p>
-                                </div>
-                                <button className='button-green'>Попробовать снова</button>
+                            <div className="text-group">
+                                <h2>Не удалось загрузить данные</h2>
+                                <p>Произошла ошибка при загрузке расписания переговорной</p>
+                            </div>
+                            <button className='button-green'>Попробовать снова</button>
                         </div>
-                    ) 
+                    )
                     : (
                         <div className="right-schedule-column">
-                        <div className="schedule__header">
-                            <div className="schedule__header--date">
-                                <h3>Расписание на день</h3>
-                                <p className="schedule-date">{currentDate}</p>
+                            <div className="schedule__header">
+                                <div className="schedule__header--date">
+                                    <h3>Расписание на день</h3>
+                                    <p className="schedule-date">{dateLabel}</p>
+                                </div>
+
+                                <div className="datepicker-schedule" ref={calendarRef}>
+                                    <button
+                                        type="button"
+                                        className="btn-choseDate"
+                                        onClick={() => setIsCalendarOpen((v) => !v)}
+                                    >
+                                        <img src={calendarIcon} alt="calendar icon" />
+                                        Выбрать дату
+                                    </button>
+
+                                    {isCalendarOpen && (
+                                        <div className="datepicker-dropdown">
+                                            <DatePicker
+                                                selected={new Date(currentDate)}
+                                                onChange={(date) => {
+                                                    onChangeDate(date);
+                                                    setIsCalendarOpen(false);
+                                                }}
+                                                locale="ru"
+                                                dateFormat="d MMMM, eeee"
+                                                minDate={new Date()}
+                                                inline
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                            <button className="btn-choseDate">
-                                <img src={calendarIcon} alt="calenadr icon" />
-                                Выбрать дату
-                            </button>
-                        </div>
-                        <div className="timeline-container">
-                            <div className="timeline-grid">
-                                {timeSlots.map(time => (
-                                    <div key={time} className="timeline-hour-row">
-                                        <span className="timeline-hour-label">{time}</span>
-                                        <div className="timeline-hour-line"></div>
-                                    </div>
-                                ))}
+                            <div className="timeline-container">
+                                <div className="timeline-grid">
+                                    {timeSlots.map(time => (
+                                        <div key={time} className="timeline-hour-row">
+                                            <span className="timeline-hour-label">{time}</span>
+                                            <div className="timeline-hour-line"></div>
+                                        </div>
+                                    ))}
+                                </div>
+                                {renderBookings()}
+                            </div>
+                            <div className="schedule-action">
+                                <button
+                                    className={`button-green btn-book`}
+                                    onClick={onClick}
+                                >
+                                    Забронировать переговорную
+                                </button>
                             </div>
                         </div>
-                        <div className="schedule-action">
-                            <button
-                                className={`button-green btn-book`}
-                                onClick={onClick}
-                            >
-                                Забронировать переговорную
-                            </button>
-                        </div>
-                    </div>
                     )
                 }
-                
             </div>
         </div>
-    )
+    );
 }
 
 export default RoomDetail;

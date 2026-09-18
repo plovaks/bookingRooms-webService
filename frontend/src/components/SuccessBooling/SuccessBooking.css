@@ -1,0 +1,51 @@
+.booking__toast{
+    display:flex;
+    gap:1rem;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    border: 1px rgba(16, 185, 129, 1) solid;
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.booking__toast--visible{
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.booking__toast--hidden {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+}
+
+.successful-booking__Img{
+    width: 2.25rem;
+    height: 2.25rem;
+}
+
+.toast-content{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap:0.25rem;
+}
+
+.toast-content h2{
+    font-size: 1rem;
+}
+
+.toast-content p{
+    font-size: 0.8rem;
+    font-weight: 400;
+}
+
+.close-image{
+    width: 1rem;
+    height: 1rem;
+}
+
+.toast-close{
+    background-color: transparent;
+    border:none;
+}
