@@ -64,9 +64,10 @@ function RoomDetail({
                     <div
                         key={booking.id}
                         className={`timeline-booking ${isMine ? '' : 'timeline-booking--busy'}`}
-                        style={{ top: `${top}px`, height: `${height}px` }}
+                        style={{ top: `${top}px`, height: `${ height}px` }}
+                        
                     >
-                        {label}
+                        <span>{label}</span>
                     </div>
                 );
             })}
@@ -200,7 +201,7 @@ function RoomDetail({
                                                     setIsCalendarOpen(false);
                                                 }}
                                                 locale="ru"
-                                                dateFormat="d MMMM, eeee"
+                                                dateFormat="d MMMM, eee"
                                                 minDate={new Date()}
                                                 inline
                                             />

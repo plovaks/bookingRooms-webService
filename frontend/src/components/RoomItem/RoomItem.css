@@ -89,6 +89,22 @@
     gap:0.8rem;
     justify-content: space-between;
     margin-bottom: 0;
+    width: 100%;
+}
+
+.card-actions .More,
+.card-actions .btn-book{
+    flex: 1;
+    text-align: center;
+}
+
+.card-actions .More{
+    font-weight: 600;
+}
+
+.card-actions .btn-book{
+    background-color: rgba(13, 148, 136, 1);
+    color:rgba(255, 255, 255, 1);
 }
 
 .room-card-disabled .btn-book{

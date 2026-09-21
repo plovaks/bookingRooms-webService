@@ -1,6 +1,8 @@
 import './SuccessBooking.css'
+import toast from 'react-hot-toast'
 import statusImg from "../../assets/status-badge.svg"
 import closeImg from "../../assets/close-btn.svg"
+
 
 function SuccessBooking({t, bookingInfo}){
     return(

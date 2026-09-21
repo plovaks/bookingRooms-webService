@@ -1,0 +1,46 @@
+.booking-card{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 1rem;
+    border:1px rgba(226, 232, 240, 1) solid;
+}
+
+.booking-date{
+    background-color: rgba(248, 250, 252, 1);
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap:0.25rem;
+    border-radius: 0.75rem;
+    text-align: center;
+}
+
+.booking-date .date{
+    color: rgba(15, 23, 42, 1);
+    font-weight: 800;
+    font-size: 1.5rem;
+}
+
+.booking-date .month{
+    font-weight: 700;
+    color:rgba(148, 163, 184, 1);
+    font-size: 0.75rem;
+}
+
+.roomName{
+   display: flex;
+   align-items: center;
+   gap:2px;
+   color:rgba(13, 148, 136, 1);
+   font-weight: 600;
+   font-size: 0.9rem;
+
+}
+
+.roomName::before{
+    content: url("../../assets/roomIcon.svg");
+    
+}

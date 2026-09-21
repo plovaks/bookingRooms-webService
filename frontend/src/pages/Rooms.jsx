@@ -1,4 +1,5 @@
 import { useState, useEffect} from "react";
+import { useSearchParams } from "react-router";
 import OfficeSelector from "../components/OfficeSelector";
 import RoomsNoOffices from "../components/RoomsStates/RoomsNoOffices";
 import RoomsError from "../components/RoomsStates/RoomsError";
@@ -9,11 +10,13 @@ import FiletrBar from "../components/FilterBar"
 import './Rooms.css'
 function Rooms(){
     const [rooms, setRooms] = useState([]); // переговорки конкретного офиса
-    const [selectedOffice, setSelectedOffice] = useState(null); // выбранный офис
     const [offices, setOffices] = useState([]); // все офисы 
     const [loading, setIsLoading] = useState(false); // состояние загрузки переговорок
     const [error, setError] = useState(false); // состояние для ошибки загрузки
     
+    const [searchParams, setsearchParams] = useSearchParams();
+    const officeIdFromUrl = searchParams.get("officeId");
+
     const serverUrl = import.meta.env.VITE_API_URL;
 
     const [filters, setFilters] = useState({
@@ -22,6 +25,16 @@ function Rooms(){
         duration:null,
         capacity:null
     })
+
+    const selectedOffice = offices.find(office => office.id === officeIdFromUrl);
+
+    const handleOfficeChange = (office) => {
+        if (office){
+            setsearchParams({officeId:office.id});
+        }else{
+            setsearchParams({});
+        }
+    }
 
     const isEventOverlappingUserTime = (eventStartsAt, eventEndsAt) => {
     
@@ -58,7 +71,10 @@ function Rooms(){
 
     // загрузка переговорок выбранного офиса
     useEffect(() =>{
-        if (!selectedOffice) return; 
+         if (!selectedOffice || !filters.date || !filters.time || !filters.duration) {
+            setRooms([]); 
+            return; 
+        }
 
         const loadRooms = async() => {
             setIsLoading(true);
@@ -154,7 +170,7 @@ function Rooms(){
         <div className="rooms-page-wrapper">
            <OfficeSelector
             selectedOffice={selectedOffice}
-            onOfficeChange={setSelectedOffice}
+            onOfficeChange={handleOfficeChange}
             offices={offices}
            />
            <FiletrBar
@@ -188,6 +204,7 @@ function Rooms(){
                                     capacity={room.capacity}
                                     availability={room.available}
                                     busyUntil={room.busyUntil}
+                                    officeName={selectedOffice?.name}
                                 />
                         ))}
                     </div>

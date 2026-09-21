@@ -55,6 +55,7 @@
     text-align: center;
     flex-grow: 1; 
     width: 100%;
+    gap:1.5rem;
 }
 
 .main-content button{
@@ -83,7 +84,7 @@
     overflow-y: auto;   
 }
 
-.btn-knowMore{
+.More{
     background-color: transparent;
     color:rgba(13, 148, 136, 1);
 }

@@ -1,7 +1,9 @@
 import { Link } from 'react-router';
 import './RoomItem.css'
-function RoomItem({id,name, floor, capacity, availability, busyUntil}){
+
+function RoomItem({id,name, floor, capacity, availability, busyUntil, officeName}){
     const isAvailable = availability ?? true;
+
     return(
         <div className={`room-card ${!isAvailable ? "room-card-disabled" : ""}`}>
             <div className="card-header">
@@ -18,14 +20,21 @@ function RoomItem({id,name, floor, capacity, availability, busyUntil}){
             </div>
             <div className="card-actions">
                 <Link
-                    className='btn-knowMore'
+                    className='More'
                     to={`/rooms/${id}`}
                 >
                     Подробнее
                 </Link>
                 
-                <button className='btn-book'>Забронировать</button>
+                <button 
+                    className='btn-book'
+                    
+                >
+                        Забронировать
+                </button>
             </div>
+
+            
         </div>
     )
 }

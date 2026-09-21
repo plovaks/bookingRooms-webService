@@ -60,6 +60,7 @@ function BookingModal({ roomId, onClose, onSuccess }) {
             comment: comment,
             startsAt: startDateTime.toISOString(),
             endsAt: endTimeDate.toISOString(),
+            officeName:roomId.officeName
         };
 
         try {
@@ -227,7 +228,7 @@ function BookingModal({ roomId, onClose, onSuccess }) {
                     <>
                         <div className="modal-header">
                             <h2>Новое бронирование</h2>
-                            <p>Переговорная: <span className='room-name'>{roomId.name}</span> ({roomId.office?.name}, {roomId.floor} этаж)</p>
+                            <p>Переговорная: <span className='room-name'>{roomId.name}</span> ({roomId.officeName}, {roomId.floor} этаж)</p>
                         </div>
                         <div className='form-line'></div>
                         <form className='booking-form' onSubmit={handleSubmit}>
