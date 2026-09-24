@@ -22,7 +22,7 @@ html, body {
   padding: 0;
   box-sizing: border-box;
   height: 100%;
-}
+  }
 
 
 body {
@@ -31,7 +31,9 @@ body {
   font-family: 'Manrope', sans-serif;
   display: flex;
   flex-direction: column;
+  
 }
+
 
 
 #root {

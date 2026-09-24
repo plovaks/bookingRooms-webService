@@ -30,17 +30,47 @@
     font-size: 0.75rem;
 }
 
+.booking-info{
+    margin-left: 1.5rem;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    gap:0.5rem;
+}
+
+.booking-room{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap:1rem;
+}
+
 .roomName{
-   display: flex;
+   display:inline-flex;
    align-items: center;
-   gap:2px;
+   gap:8px;
    color:rgba(13, 148, 136, 1);
    font-weight: 600;
    font-size: 0.9rem;
 
 }
 
-.roomName::before{
-    content: url("../../assets/roomIcon.svg");
-    
+
+.greyCircle{
+    display: inline-block;
+    background-color: rgba(148, 163, 184, 1);
+    width: 0.25rem;
+    height: 0.25rem;
+    border-radius: 50%;
+}
+
+.btn-cancelBooking{
+    background-color: transparent;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    border:1px rgba(239, 68, 68, 1) solid;
+    color: rgba(239, 68, 68, 1);
+    font-weight: 600;
+    font-family: 'Manrope';
 }

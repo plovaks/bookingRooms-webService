@@ -1,12 +1,12 @@
 import { useState, useEffect} from "react";
 import { useSearchParams } from "react-router";
-import OfficeSelector from "../components/OfficeSelector";
-import RoomsNoOffices from "../components/RoomsStates/RoomsNoOffices";
-import RoomsError from "../components/RoomsStates/RoomsError";
-import RoomsEmpty from "../components/RoomsStates/RoomsEmpty";
-import RoomLoadingItem from "../components/RoomItem/RoomLoadingItem";
-import RoomItem from "../components/RoomItem/RoomItem";
-import FiletrBar from "../components/FilterBar"
+import OfficeSelector from "../../components/OfficeSelector";
+import RoomsNoOffices from "../../components/RoomsStates/RoomsNoOffices";
+import RoomsError from "../../components/RoomsStates/RoomsError";
+import RoomsEmpty from "../../components/RoomsStates/RoomsEmpty";
+import RoomLoadingItem from "../../components/RoomItem/RoomLoadingItem";
+import RoomItem from "../../components/RoomItem/RoomItem";
+import FiletrBar from "../../components/FilterBar"
 import './Rooms.css'
 function Rooms(){
     const [rooms, setRooms] = useState([]); // переговорки конкретного офиса

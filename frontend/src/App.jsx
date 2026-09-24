@@ -1,9 +1,9 @@
 import { Route, Routes } from 'react-router'
 import './App.css'
-import Booking from './pages/Booking'
+import Booking from './pages/Booking/Booking'
 import RoomId from './pages/RoomId/RoomId'
 import NotFound from './pages/NotFound'
-import Rooms from './pages/Rooms'
+import Rooms from './pages/Rooms/Rooms'
 import Navbar from './components/Navbar'
 import { Toaster } from 'react-hot-toast'
 
