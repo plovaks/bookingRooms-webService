@@ -3,9 +3,11 @@ import { Link } from "react-router";
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import BookingCard from "../../components/BookingCard/BookingCard";
+import CancelBooking from "../../components/Modals/CancelBooking";
 import './Booking.css'
 import emptyBookings from "../../assets/emptyBookings.svg"
 import errorBookings from "../../assets/roomsErrorAlert.svg"
+
 
 function Booking(){
     const serverUrl = import.meta.env.VITE_API_URL;
@@ -18,7 +20,8 @@ function Booking(){
     const [loadingError, setLoadingError] = useState(false);
     // счетчик попыток для перезагрузке
     const [retryCount, setRetryCount] = useState(0);
-    
+    const [bookingToCancel, setBookingToCancel] = useState(null);
+
     const today = new Date();
 
     // загрузка бронирований
@@ -54,7 +57,7 @@ function Booking(){
         const loadOffices = async() => {
             setLoadingError(false);
             try {
-                const res  = await fetch(`.${serverUrl}/api/v1/offices`);
+                const res  = await fetch(`${serverUrl}/api/v1/offices`);
                 if (!res.ok){
                     throw new Error('ошибка обращения к HTTP офисов');
                 }
@@ -70,6 +73,30 @@ function Booking(){
         }
         loadOffices();
     }, [serverUrl])
+
+
+    // удаление бронирования 
+
+    const handleCancelBooking = async () => {
+        if (!bookingToCancel) return;
+
+        try {
+            const res = await fetch(`${serverUrl}/api/v1/bookings/${bookingToCancel.id}`, {
+                method: 'DELETE'
+            });
+
+            if (!res.ok) {
+                throw new Error('Не удалось отменить бронирование');
+            }
+
+            setBookings(prevBookings => prevBookings.filter(b => b.id !== bookingToCancel.id));
+            setBookingToCancel(null);
+            
+        } catch (error) {
+            console.error('Ошибка при удалении:', error);
+        }
+    };
+
 
     function countDuration(startsAt, endsAt, timezone) {
         const start = new Date(startsAt);
@@ -231,10 +258,29 @@ function Booking(){
                                     duration={countDuration(booking.startsAt, booking.endsAt, booking.office?.timezone)}
                                     loading={loading}
                                     isPast={activeTab === 'past'}
+                                    onCancelClick={() => setBookingToCancel(booking)}
                                 />))
                         )}
                     </div>
                 )
+            )}
+            {bookingToCancel && (
+                <CancelBooking
+                    bookingTitle={bookingToCancel.title}
+                    roomName={bookingToCancel.room?.name}
+                    roomFloor={bookingToCancel.room?.floor}
+                    bookingDate={`${
+                        new Date(bookingToCancel.startsAt).toLocaleString('ru-RU', { 
+                            weekday: 'long', 
+                            day: 'numeric', 
+                            month: 'long' 
+                        }).replace(/^./, (s) => s.toUpperCase()) 
+                    }, ${
+                        countDuration(bookingToCancel.startsAt, bookingToCancel.endsAt, bookingToCancel.office?.timezone).slice(0, -4)
+                    }`}
+                    onClose={() => setBookingToCancel(null)}
+                    onCancelBooking={handleCancelBooking}
+                />
             )}
             
         </div>

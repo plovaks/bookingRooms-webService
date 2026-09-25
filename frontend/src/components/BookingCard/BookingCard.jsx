@@ -2,10 +2,9 @@ import { useState } from 'react';
 import './BookingCard.css'
 import roomIcon from "../../assets/roomIcon.svg"
 import Skeleton from 'react-loading-skeleton';
-import CancelBooking from '../Modals/CancelBooking';
 
-function BookingCard({title, startsAt, roomName, floor, duration, loading, isPast}){
-    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+function BookingCard({title, startsAt, roomName, floor, duration, loading, isPast, onCancelClick}){
+    
 
     function formatDate(date){
         const newDate = new Date(date);
@@ -35,11 +34,12 @@ function BookingCard({title, startsAt, roomName, floor, duration, loading, isPas
             {!isPast && (
                 <button 
                     className="btn-cancelBooking"
-                    onClick={() => setIsCancelModalOpen(true)}
+                    onClick={onCancelClick}
                 >
                         {loading ? <Skeleton width={100} height={38}/> : 'Отменить'}
                 </button>
             )}
+            
             
         </div>
     )

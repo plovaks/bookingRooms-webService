@@ -1,0 +1,100 @@
+.cancel-booking-overlay{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top:0;
+    right: 0;
+    background-color: rgba(15, 23, 42, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.cancel-booking-content{
+    width:30rem;
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 2rem;
+    gap:1.5rem;
+}
+
+.cancel-booking__heder{
+    display: flex;
+    flex-direction: column;
+    gap:0.5rem;
+}
+
+.cancel-booking__heder h2{
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: rgba(15, 23, 42, 1);
+}
+
+.cancel-booking__heder p{
+    font-weight: 400;
+    color: rgba(71, 85, 105, 1);
+}
+
+.cancel-info p{
+    display: flex;
+    align-items: center;
+    gap:0.5rem;
+}
+
+.cancel-info img {
+    width: 1rem;
+    height: 1rem;
+    object-fit: contain;
+}
+
+.cancel-booking__main{
+    padding: 1rem;
+    background-color: rgba(248, 250, 252, 1);
+    border-radius: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap:0.75rem;
+}
+
+.cancel-booking__main h3{
+    color:rgba(15, 23, 42, 1);
+    font-weight: 700;
+}
+
+.cancel-info{
+    color:rgba(71, 85, 105, 1);
+    font-weight: 400;
+    font-size: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap:0.4rem;
+}
+
+.cancel-booking__actions{
+    display: flex;
+    gap:0.75rem;
+}
+
+.cancel-booking__actions button{
+    flex:1;
+    padding-block: 0.75rem;
+    cursor: pointer;
+    background-color: transparent;
+    border:none;
+    font-family: 'Manrope', sans-serif;
+    border:1px rgba(226, 232, 240, 1) solid;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    color: rgba(71, 85, 105, 1);
+    font-size: 0.9;
+}
+
+.cancel-booking__actions button:nth-of-type(2){
+    background-color: rgba(239, 68, 68, 1);
+    color: rgba(255, 255, 255, 1);
+    border: transparent;
+}
