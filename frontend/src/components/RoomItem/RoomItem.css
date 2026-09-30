@@ -110,10 +110,12 @@
 .room-card-disabled .btn-book{
     background-color: rgba(226, 232, 240, 1);
     color: rgba(148, 163, 184, 1);
+    cursor: none;
 }
 
 .room-card-disabled .availability-bar{
     background-color: rgba(226, 232, 240, 1);
+    color:rgba(71, 85, 105, 1);
 }
 
 

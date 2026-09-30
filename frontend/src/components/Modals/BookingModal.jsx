@@ -10,10 +10,18 @@ import SuccessBooking from '../SuccessBooling/SuccessBooking';
 import 'react-datepicker/dist/react-datepicker.css';
 registerLocale('ru', ru);
 
-function BookingModal({ roomId, onClose, onSuccess }) {
+function BookingModal({ room, onClose, onSuccess, initialFilters }) {
     const serverUrl = import.meta.env.VITE_API_URL;
 
-    const [startDate, setStartDate] = useState(new Date());
+    const [startDate, setStartDate] = useState(() => {
+        if (!initialFilters?.date) return new Date();
+        const [y, m, d] = initialFilters.date.split('-').map(Number);
+        return new Date(y, m - 1, d);
+    });
+    
+    const [time, setTime] = useState(initialFilters?.time || '');
+    const [duration, setDuration] = useState(initialFilters?.duration || null);
+
     const maxBookingDate = new Date();
     maxBookingDate.setDate(maxBookingDate.getDate() + 30);
 
@@ -21,8 +29,6 @@ function BookingModal({ roomId, onClose, onSuccess }) {
     const [status, setStatus] = useState('form');
     const [theme, setTheme] = useState('');
     const [themeError, setThemeError] = useState(false);
-    const [time, setTime] = useState('');
-    const [duration, setDuration] = useState(null);
     const [durationOpen, setDurationOpen] = useState(false);
     const [comment, setComment] = useState('');
 
@@ -42,7 +48,7 @@ function BookingModal({ roomId, onClose, onSuccess }) {
         setThemeError(false);
 
         if (!time || !duration) {
-            alert('Пожалуйста, выберите время и продолжительность встречи');
+            toast.error('Пожалуйста, выберите время и продолжительность встречи');
             return;
         }
 
@@ -55,14 +61,13 @@ function BookingModal({ roomId, onClose, onSuccess }) {
         endTimeDate.setMinutes(endTimeDate.getMinutes() + duration);
 
         const bookingData = {
-            roomId: roomId.id,
+            roomId: room.id,
             title: theme,
             comment: comment,
             startsAt: startDateTime.toISOString(),
             endsAt: endTimeDate.toISOString(),
-            officeName:roomId.officeName
+            officeName: room.officeName ?? room.office?.name
         };
-
         try {
             const res = await fetch(`${serverUrl}/api/v1/bookings`, {
                 method: 'POST',
@@ -73,7 +78,7 @@ function BookingModal({ roomId, onClose, onSuccess }) {
             });
 
             if (res.ok) {
-                const bookingInfoText = `Комната ${roomId.name}, ${formatSelectedDate(startDate)}, ${getBannerTimeText().slice(2)} MSK`;
+                const bookingInfoText = `Комната ${room.name}, ${formatSelectedDate(startDate)}, ${getBannerTimeText().slice(2)} MSK`;
 
                 toast.custom(
                     (t) => <SuccessBooking t={t} bookingInfo={bookingInfoText} />,
@@ -127,6 +132,7 @@ function BookingModal({ roomId, onClose, onSuccess }) {
         }
 
         setTime(input);
+        setDuration(null); 
     };
 
     const handleTimeBlur = () => {
@@ -228,7 +234,7 @@ function BookingModal({ roomId, onClose, onSuccess }) {
                     <>
                         <div className="modal-header">
                             <h2>Новое бронирование</h2>
-                            <p>Переговорная: <span className='room-name'>{roomId.name}</span> ({roomId.officeName}, {roomId.floor} этаж)</p>
+                            <p>Переговорная: <span className='room-name'>{room.name}</span> ({room.officeName ?? room.office?.name}, {room.floor} этаж)</p>
                         </div>
                         <div className='form-line'></div>
                         <form className='booking-form' onSubmit={handleSubmit}>

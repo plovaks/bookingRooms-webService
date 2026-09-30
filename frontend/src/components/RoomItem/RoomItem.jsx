@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import './RoomItem.css'
 
-function RoomItem({id,name, floor, capacity, availability, busyUntil, officeName}){
+function RoomItem({id,name, floor, capacity, availability, busyUntil, officeName, onBookClick}){
     const isAvailable = availability ?? true;
 
     return(
@@ -16,7 +16,9 @@ function RoomItem({id,name, floor, capacity, availability, busyUntil, officeName
             </div>
             <div className="availability-bar">
                 <span className='availability-circle'></span>
-                <p className='availability-text'>{isAvailable ? "Доступно на выбранное время" : "Недоступно на выбранное время"}</p>
+                <p className='availability-text'>
+                    {isAvailable ? "Доступно на выбранное время" : "Недоступно на выбранное время"}
+                </p>
             </div>
             <div className="card-actions">
                 <Link
@@ -26,9 +28,11 @@ function RoomItem({id,name, floor, capacity, availability, busyUntil, officeName
                     Подробнее
                 </Link>
                 
-                <button 
+                <button
+                    type='button'
                     className='btn-book'
-                    
+                    onClick={onBookClick}
+                    disabled={!isAvailable}
                 >
                         Забронировать
                 </button>

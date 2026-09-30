@@ -148,31 +148,45 @@ li {
 /* сетка часов */
 
 .timeline-grid {
-    margin-block: 1.5rem;
     color: rgba(71, 85, 105, 1);
+     margin-block: 0;
 }
 
 .timeline-hour-row {
+    position: relative;
     height: 48px;
 }
 
 .timeline-hour-line {
-    flex-grow: 1;
+    position: absolute;
+    top: 0;
+    left: 4.5rem;
+    right: 0;
     height: 1px;
     background-color: rgba(226, 232, 240, 1);
-    margin-left: 4rem;
-    margin-top: 0;
 }
 
 /* стили для забронированных комнат */
 
 .timeline-container {
     position: relative;
+    padding-top: 1.5rem;
+}
+
+
+.timeline-hour-label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3rem;
+    transform: translateY(-50%);  
+    text-align: right;
+    font-size: 0.875rem;
 }
 
 .timeline-bookings {
     position: absolute;
-    inset: 0;
+    inset: 1.5rem 0 0 0;        
     pointer-events: none;
 }
 
@@ -195,9 +209,8 @@ li {
     display: flex;            
     align-items: center;      
     padding-block: 0;         
-    line-height: 1;           
+    line-height: 1;         
 }
-
 
 
 .timeline-booking--busy {
@@ -292,4 +305,9 @@ li {
 .datepicker-dropdown .react-datepicker__day-name {
     color: rgba(71, 85, 105, 1);
 }
+
+
+
+
+
 
