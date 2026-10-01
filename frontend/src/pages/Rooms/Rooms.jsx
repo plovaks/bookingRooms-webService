@@ -31,7 +31,10 @@ function Rooms(){
     const handleCloseBooking = () => setSelectedRoomForBooking(null);
 
     const parseLocalDate = (str) => {
-        const [y, m, d] = str.split('-').map(Number);
+        if (str instanceof Date) return str;
+
+        const stringDate = String(str);
+        const [y, m, d] = stringDate.split('-').map(Number);
         return new Date(y, m - 1, d);
     };
 
@@ -62,15 +65,6 @@ function Rooms(){
             localStorage.removeItem(OFFICE_STORAGE_KEY);
         }
     }
-
-    
-    useEffect(() => {
-        if (officeIdFromUrl) return;
-        const savedOfficeId = localStorage.getItem(OFFICE_STORAGE_KEY);
-        if (savedOfficeId) {
-            setsearchParams({ officeId: savedOfficeId }, { replace: true });
-        }
-    }, [officeIdFromUrl, setsearchParams]);
 
     const isEventOverlappingUserTime = (eventStartsAt, eventEndsAt) => {
     
@@ -124,16 +118,18 @@ function Rooms(){
                 }
 
                 if (filters.date && filters.time && filters.duration){
-                    const fromDate = parseLocalDate(filters.date);
-                    const [hours, minutes] = filters.time.split(':').map(Number);
+                    const fromDate = filters.date instanceof Date ? new Date(filters.date) : parseLocalDate(filters.date);
+    
+                    if (!isNaN(fromDate.getTime())) {
+                        const [hours, minutes] = filters.time.split(':').map(Number);
+                        fromDate.setHours(hours, minutes, 0, 0);
 
-                    fromDate.setHours(hours, minutes, 0, 0);
+                        const toDate = new Date(fromDate.getTime() + filters.duration * 60000);
+                        const fromIso = encodeURIComponent(fromDate.toISOString());
+                        const toIso = encodeURIComponent(toDate.toISOString());
 
-                    const toDate = new Date(fromDate.getTime() + filters.duration * 60000);
-                    const fromIso = encodeURIComponent(fromDate.toISOString());
-                    const toIso = encodeURIComponent(toDate.toISOString());
-
-                    url+=`&from=${fromIso}&to=${toIso}`
+                        url += `&from=${fromIso}&to=${toIso}`;
+                    }
                 }
 
                 const res = await fetch(url);
@@ -230,7 +226,7 @@ function Rooms(){
                     </div>
                 </>
             ): error ? (
-                <RoomsError/>
+                <RoomsError onReload={() => setReloadKey((k) => k + 1)}/>
             ) : rooms.length > 0 ? (<>
                     <h2 className="selectedOffice__header">Доступные переговорные в этом офисе</h2>
                     <div className="rooms_main-content__items">
@@ -249,7 +245,7 @@ function Rooms(){
                         ))}
                     </div>
             </>) : (
-                <RoomsEmpty/>
+                <RoomsEmpty setFilters={setFilters}/>
             )
             )}
             

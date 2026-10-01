@@ -21,6 +21,9 @@ function RoomId() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentUserId, setCurrentUserId] = useState(null);
 
+    // для повторной загрузки расписания
+    const [reloadKey, setReloadKey] = useState(0);
+
     useEffect(() => {
         const loadMe = async () => {
             try {
@@ -60,6 +63,8 @@ function RoomId() {
         setIsModalOpen(true);
     }
 
+
+    // загрузка расписания 
     const loadBookingsschedule = useCallback(async () => {
         if (!paramId) return;
 
@@ -90,7 +95,7 @@ function RoomId() {
 
     useEffect(() => {
         loadBookingsschedule();
-    }, [loadBookingsschedule]);
+    }, [loadBookingsschedule, reloadKey]);
 
     function handleChangeDate(newDate) {
         const d = new Date(newDate);
@@ -114,11 +119,12 @@ function RoomId() {
                 onClick={handleBookRoom}
                 currentUserId={currentUserId}
                 onChangeDate={handleChangeDate}
+                onReloadSchedule = {() => setReloadKey(k => k+1)}
             />
 
             {isModalOpen && (
                 <BookingModal
-                    roomId={roomDetails}
+                    room={roomDetails}
                     onClose={() => setIsModalOpen(false)}
                     onSuccess={handleBookingSuccess}
                 />

@@ -1,12 +1,14 @@
 import logoImg from "../assets/logo-badge.svg"
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import { useEffect, useState } from "react";
 import "./Navbar.css"
 
+const OFFICE_STORAGE_KEY = 'selectedOfficeId';
 
 function Navbar(){
     const apiUrl = import.meta.env.VITE_API_URL;
     const [userData, setUserData] = useState(null);
+    const location = useLocation();
 
     useEffect(() => {
         const handleUserData = async () => {
@@ -29,7 +31,11 @@ function Navbar(){
         handleUserData();
     }, [apiUrl])
 
-    useEffect
+    const getRoomsLink = () => {
+        const savedOfficeId = localStorage.getItem(OFFICE_STORAGE_KEY);
+        return savedOfficeId ? `/rooms?officeId=${savedOfficeId}` : "/rooms";
+
+    }
 
     return(
         <nav className="navbar">
@@ -38,7 +44,7 @@ function Navbar(){
                 <span className="logo-text">BookRoom</span>
             </div>
             <div className="navbar__nav-links">
-                <NavLink to="/" className="nav-link">Переговорные</NavLink>
+                <NavLink to={getRoomsLink()} className="nav-link">Переговорные</NavLink>
                 <NavLink to="/bookings" className="nav-link">Мои бронирования</NavLink>
             </div>
             {userData && (

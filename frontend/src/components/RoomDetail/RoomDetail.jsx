@@ -18,6 +18,7 @@ function RoomDetail({
     onClick,
     currentUserId,
     onChangeDate,
+    onReloadSchedule
 }) {
     const DAY_START_HOUR = 9;
     const HOUR_HEIGHT = 48;
@@ -171,7 +172,7 @@ function RoomDetail({
                                 <h2>Не удалось загрузить данные</h2>
                                 <p>Произошла ошибка при загрузке расписания переговорной</p>
                             </div>
-                            <button className='button-green'>Попробовать снова</button>
+                            <button onClick={onReloadSchedule} className='button-green'>Попробовать снова</button>
                         </div>
                     )
                     : (
